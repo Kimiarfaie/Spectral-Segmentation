@@ -12,22 +12,24 @@ ref = WhiteRef.Multi_90white;
 
 
 %%
-white_band = white(213:500,:,:);
+white_band = white(400,:,:);
 white_band = mean(white_band, 1);
 whiteDataCropped = repmat(white_band, [1295, 1, 1]);
-darkDataExpanded = repmat(dark, [ceil(1295/size(dark, 1)), 1, 1]);
+darkDataExpanded = repmat(dark, [ceil(1295/size(dark,1)), 1, 1]);
 darkDataExpanded = darkDataExpanded(1:1295, :, :);  % Trim excess rows after repetition
 
 % Later the correctedCube will have infinite values, so we are replacing
 % the zero in whiteDataCropped - darkDataExpanded with the second min in
 % that 
+mean_white = mean(whiteDataCropped, "all");
+nonzero = correctingzero(whiteDataCropped - darkDataExpanded);
 
 
 % Flat-field correction
-dark_corrected = max(0, data - darkDataExpanded);
-correctedCube =  dark_corrected./ (whiteDataCropped - darkDataExpanded);
+dark_corrected = max(0data - darkDataExpanded);
+correctedCube =  dark_corrected./ (abs(nonzero));
 
-[~, M] = size(ref);
+[~,M] = size(ref);
 corrected=zeros(1295,900,121);
 RadianceIncident=zeros(1295,900,121);
 

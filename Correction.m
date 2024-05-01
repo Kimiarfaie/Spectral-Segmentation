@@ -7,25 +7,29 @@ WhiteRef = load("WhiteRef.mat");
 
 data = plateData.cube.DataCube;
 white = WhiteData.cube.DataCube;
-whitenew = white(213:500,:,:);
-whitenew = correctingzero(whitenew);
-dark = DarkData.cube.DataCube;
-Rw = WhiteRef.Multi_90white;
 
-% Pre-process Dark and White Data
-whiteDataExtended = repmat(whitenew, [ceil(1295/size(whitenew,1)), 1, 1]);
-whiteDataExtended = whiteDataExtended(1:1295, :, :);
-darkDataExpanded = repmat(dark, [ceil(1295/size(dark,1)), 1, 1]);
-darkDataExpanded = darkDataExpanded(1:1295, :, :);  % Trim excess rows after repetition
+dark = DarkData.cube.DataCube;
 ref = WhiteRef.Multi_90white;
 
-%%
-% Flat-field correction
-dark_corrected = max(0, data - darkDataExpanded); % To prevent having negative values
-correctedCube =  dark_corrected./ (whiteDataExtended - darkDataExpanded);
 
 %%
-[~,M] = size(ref);
+white_band = white(213:500,:,:);
+white_band = mean(white_band, 1);
+whiteDataCropped = repmat(white_band, [1295, 1, 1]);
+darkDataExpanded = repmat(dark, [ceil(1295/size(dark, 1)), 1, 1]);
+darkDataExpanded = darkDataExpanded(1:1295, :, :);  % Trim excess rows after repetition
+
+% Later the correctedCube will have infinite values, so we are replacing
+% the zero in whiteDataCropped - darkDataExpanded with the second min in
+% that 
+
+
+% Flat-field correction
+dark_corrected = max(0, data - darkDataExpanded);
+correctedCube =  dark_corrected./ (whiteDataCropped - darkDataExpanded);
+
+[~, M] = size(ref);
+
 corrected=zeros(1295,900,121);
 
 for i=1:M
@@ -39,10 +43,10 @@ RadianceIncident = correctingzero(RadianceIncident); % To prevent getting Inf in
 
 % Calculate Reflectance
 Reflectance = corrected./RadianceIncident;
-max = max(Reflectance,[],'all');
-min = min(Reflectance,[],'all');
 
-%%
+mean(Reflectance,'all')
+max(Reflectance,[],'all')
+min(Reflectance,[],'all')
 
 %%
 function output = correctingzero(input)
@@ -53,7 +57,6 @@ minvalue = min(tmp,[],"all");
 
 output = input;     
 output(output==0) = minvalue;
-
 end
 
 

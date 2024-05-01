@@ -1,8 +1,8 @@
 clc
 clear all
-plateData = load('plate02.mat');
+plateData = load('Plate02.mat');
 WhiteData = load("White.mat");
-DarkData = load("Dark Correction.mat");
+DarkData = load("DarkCorrection.mat");
 
 data = plateData.cube.DataCube;
 
@@ -18,8 +18,21 @@ darkDataExpanded = darkDataExpanded(1:1295, :, :);  % Trim excess rows after rep
 % Flat-field correction
 correctedCube = ((data - darkDataExpanded) ./ (whiteDataCropped - darkDataExpanded));
 
-% Replace any infinite or NaN values
+% Replace any NaN values
 correctedCube(isinf(correctedCube) | isnan(correctedCube)) = 0;
+
+% The white has some black spots, which has a value of 0 radiance. so we
+% will be replacing them with the non-zero minimum of the whole white
+
+tmp = whiteDataCropped;
+tmp(tmp==0) = Inf;
+minNonZero = min(tmp,[],"all");
+
+whitedatanz = whiteDataCropped;
+whitedatanz(whiteDataCropped==0) = minNonZero;
+
+% Calculating Refltance 
+Reflectance = correctedCube./whitedatanz;
 
 
 

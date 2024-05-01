@@ -15,7 +15,7 @@ ref = WhiteRef.Multi_90white;
 %%
 white_band = white(213:500,:,:);
 white_band = mean(white_band, 1);
-whiteDataCropped = repmat(white_band, [1295, 1, 1]);
+whiteDataExtended = repmat(white_band, [1295, 1, 1]);
 darkDataExpanded = repmat(dark, [ceil(1295/size(dark, 1)), 1, 1]);
 darkDataExpanded = darkDataExpanded(1:1295, :, :);  % Trim excess rows after repetition
 
@@ -26,7 +26,7 @@ darkDataExpanded = darkDataExpanded(1:1295, :, :);  % Trim excess rows after rep
 
 % Flat-field correction
 dark_corrected = max(0, data - darkDataExpanded);
-correctedCube =  dark_corrected./ (whiteDataCropped - darkDataExpanded);
+correctedCube =  dark_corrected./ (whiteDataExtended - darkDataExpanded);
 
 [~, M] = size(ref);
 
@@ -48,6 +48,31 @@ mean(Reflectance,'all')
 max(Reflectance,[],'all')
 min(Reflectance,[],'all')
 
+%%
+% Normalizing the reflectance 
+for i = 1:size(Reflectance, 3)
+    % Extract the band
+    band = Reflectance(:,:,i);
+    
+    % Find the minimum and maximum values in the band
+    minVal = min(band(:));
+    maxVal = max(band(:));
+    
+    % Perform min-max normalization
+    if maxVal > minVal  % Avoid division by zero in case maxVal equals minVal
+        NormalizedReflectance(:,:,i) = (band - minVal) / (maxVal - minVal);
+    else
+        % In case all values are the same in the band
+        NormalizedReflectance(:,:,i) = zeros(size(band)); % Optionally, set all to 0 or some other value
+    end
+end
+
+mean(NormalizedReflectance,'all')
+max(NormalizedReflectance,[],'all')
+min(NormalizedReflectance,[],'all')
+%%
+%Segmentation
+s
 %%
 function output = correctingzero(input)
 

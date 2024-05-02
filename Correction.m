@@ -72,7 +72,7 @@ max(NormalizedReflectance,[],'all')
 min(NormalizedReflectance,[],'all')
 %%
 %Segmentation
-s
+Mask = segmentation(NormalizedReflectance, 15);
 %%
 function output = correctingzero(input)
 

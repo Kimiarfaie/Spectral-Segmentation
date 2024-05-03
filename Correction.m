@@ -33,7 +33,7 @@ radianceIncident = zeros(data_length, data_width, channels);
 
 for i = 1:channels
     whiteRefExpanded = ones(data_length, data_width) * white_reflect(:, i);
-    % calculating the corrected radiance data
+    % completing the flat-field correction
     correctedRadiance(:, :, i) = correctedCube(:, :, i) .* whiteRefExpanded;
     % calculating the radiance of the incident light
     radianceIncident(:, :, i) = whiteRadExtended(:, :, i) ./ whiteRefExpanded;

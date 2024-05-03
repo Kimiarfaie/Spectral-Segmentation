@@ -72,7 +72,34 @@ max(NormalizedReflectance,[],'all')
 min(NormalizedReflectance,[],'all')
 %%
 %Segmentation
-Mask = segmentation(NormalizedReflectance, 15);
+
+% Display the first channel of the data
+figure;
+imshow(NormalizedReflectance(:, :, 10), []);
+title('Select a patch of the image');
+
+% Let user select a rectangle and get the coordinates
+rect = getrect;
+rect = round(rect); % Ensure the coordinates are integers
+x1 = rect(1);
+y1 = rect(2);
+width = rect(3);
+height = rect(4);
+
+% Extract the patch based on selected rectangle
+patch = NormalizedReflectance(y1:y1+height-1, x1:x1+width-1, :);
+
+percentile = 7:1:10;
+figure;
+for i = 1:length(percentile)
+    [RMSEmask, RCGFCmask] = segmentation(NormalizedReflectance,patch,percentile(i),percentile(i));
+    subplot(2,3,i);
+    hold on
+    imshow(RCGFCmask);
+    title(["RCGFC : factor of ", num2str(percentile(i))]);
+    hold off
+end
+
 %%
 function output = correctingzero(input)
 

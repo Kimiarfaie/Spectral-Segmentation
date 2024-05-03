@@ -70,9 +70,9 @@ end
 mean(NormalizedReflectance,'all')
 max(NormalizedReflectance,[],'all')
 min(NormalizedReflectance,[],'all')
-%%
-%Segmentation
-Mask = segmentation(NormalizedReflectance, 15);
+
+%% Segmentation
+Mask = segmentation(NormalizedReflectance, 10);
 %%
 function output = correctingzero(input)
 

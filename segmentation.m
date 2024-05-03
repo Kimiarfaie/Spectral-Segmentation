@@ -21,26 +21,56 @@ function mask = segmentation(data, factor)
     % Initialize RMSE matrix
     [rows, cols, ~] = size(data);
     rmse = zeros(rows, cols);
+    rcgfc = zeros(rows, cols);
 
     % Calculate RMSE for each pixel's spectrum
     for i = 1:rows
         for j = 1:cols
             pixelSpectrum = squeeze(data(i, j, :));
             rmse(i, j) = sqrt(mean((pixelSpectrum - referenceSpectrum).^2));
+
+            angle = sam(pixelSpectrum, referenceSpectrum);
+            gfc = cos(angle);
+            rcgfc(i,j) = sqrt(1-gfc);
+
+            % % Calculate the means
+            % mean_original = mean(referenceSpectrum, 1);
+            % mean_reconstructed = mean(pixelSpectrum, 1);
+            % 
+            % % Calculate the numerator of GFC
+            % numerator = sum((referenceSpectrum - mean_original) .* ...
+            %     (pixelSpectrum - mean_reconstructed), 1);
+            % 
+            % % Calculate the denominator of GFC
+            % denominator = sqrt(sum((referenceSpectrum - mean_original).^2, 1)) .* ...
+            %     sqrt(sum((pixelSpectrum - mean_reconstructed).^2, 1));
+            % 
+            % % Calculate GFC for each column (spectrum)
+            % GFC = (numerator ./ denominator) .^ 2;
+            % 
+            % % Calculate the mean GFC to get an overall quality measure
+            % 
+            % % Calculate CGFC and RCGFC
+            % CGFC = 1 - GFC;
+            % RCGFC(i,j) = sqrt(CGFC);
         end
     end
 
-    % Find the minimum RMSE to set a threshold
-    minRMSE = min(rmse(:));
-    %threshold = minRMSE * factor; % Adjust the threshold as needed
-
-    threshold = prctile(rmse(:), factor);  % Use the 10th percentile
+    
+    threshold_rmse = prctile(rmse(:), factor);  % Use the factor percentile
+    threshold_rcgfc = prctile(rcgfc(:), factor);  
 
     % Create a mask where RMSE is below the threshold
-    mask = rmse <= threshold;
+    mask_rmse = rmse <= threshold_rmse;
+    mask_rcgfc = rcgfc <= threshold_rcgfc;
 
     % Display the mask
     figure;
-    imshow(mask);
-    title('Mask of selected color');
+    imshow(mask_rmse);
+    title('Mask of selected color based on RMSE');
+
+    figure;
+    imshow(mask_rcgfc);
+    title('Mask of selected color based on RCGFC');
+    mask = mask_rmse;
 end

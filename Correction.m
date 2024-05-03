@@ -110,6 +110,9 @@ for i = 1:length(percentiles)
     hold off
 end
 
+%% Illumination Simulation
+visualise_relighting(normalizedReflectance);
+
 %% Function to replace the zero values with the second smallest value
 function output = correct_zero(input)
 output = input; 

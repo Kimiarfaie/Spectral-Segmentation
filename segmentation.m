@@ -17,6 +17,7 @@ function [maskRMSE, maskRCGFC] = segmentation(data, patch, RMSEfactor, RCGFCfact
         end
     end
 
+    % setting the thresholds as the percentile defined by the factors
     threshold1 = prctile(rmse(:), RMSEfactor);  % Use the factor percentile
     threshold2 = prctile(rcgfc(:), RCGFCfactor);  % Use the factor percentile
 

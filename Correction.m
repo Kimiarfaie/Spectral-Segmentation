@@ -25,7 +25,7 @@ darkRadExpanded = darkRadExpanded(1:data_length, :, :);  % Trim excess rows afte
 
 % Flat-field correction
 dark_corrected = max(0, data - darkRadExpanded); % handling negative values
-correctedCube =  dark_corrected./ (whiteRadExtended - darkRadExpanded);
+correctedCube =  dark_corrected./ (whiteRadExtended - darkRadExpanded); % applying the formula
 
 
 correctedRadiance = zeros(data_length, data_width, channels);
@@ -39,7 +39,7 @@ for i = 1:channels
     radianceIncident(:, :, i) = whiteRadExtended(:, :, i) ./ whiteRefExpanded;
 end
 
-% Later the correctedCube will have infinite values, so we are replacing
+% Later, the correctedCube will have infinite values, so we are replacing
 % the zero in RadianceIncident with the second smallest value
 radianceIncident = correct_zero(radianceIncident); % To prevent getting Inf in the reflectance
 
@@ -101,6 +101,8 @@ for i = 1:length(percentiles)
     % and identifying regions with similar pigments using RMSE and RCGFC
     [RMSEmask, RCGFCmask] = segmentation(normalizedReflectance, patch, ...
         percentiles(i), percentiles(i));
+
+    % displaying the mask of the segmented regions
     subplot(2,3,i);
     hold on
     imshow(RCGFCmask);

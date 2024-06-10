@@ -1,8 +1,7 @@
 # Spectral-Imaging-Lab
 The assignment for the Spectral Imaging Lab in UGR.
 
-The objective of this project is to process the raw hypersectral data, acquired with the Pika L device (Hyperspectral Imaging Camera), and applying flat-field correction to the data. Subse-
-quently, the following tasks will be undertaken: 
+The objective of this project is to process the raw hypersectral data, acquired with the Pika L device (Hyperspectral Imaging Camera), and applying flat-field correction to the data. Subsequently, the following tasks will be undertaken: 
 
 Task 1: Spectral Segmentation
 Implement spectral segmentation to identify regions containing red, green, and blue pigments within the processed data cube.
